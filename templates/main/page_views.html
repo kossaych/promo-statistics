@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Views</title>
+</head>
+<body>
+    <h1>All Page Views</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Page</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for view in views %}
+                <tr>
+                    <td>{{ view.student_id }}</td>
+                    <td>{{ view.page }}</td>
+                    <td>{{ view.date_time }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No views recorded yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SQL Dashboard Terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #00ff90;
+      font-family: 'Source Code Pro', monospace;
+      padding: 0px 20px;
+      display: flex;
+      flex-direction: column; 
+      align-items: flex-start;
+      min-height: 100vh;
+      width: 100%; 
+      margin: 20px 0px; 
+    }
+
+    .sql-line {
+      font-size: 50px;
+      margin: 0px 0;
+    }
+
+    .keyword { color: #569CD6; }
+    .table-name { color: #9CDCFE; }
+    .link {
+      text-decoration: none;
+      color: #00ff90;
+      border-bottom: 1px dashed #00ff90;
+    }
+
+    .link:hover {
+      color: #ff4081;
+      border-bottom: 1px dashed #ff4081;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 30px;
+      height: 50px;
+      background-color: #00ff90;
+      animation: blink 1s infinite;
+      vertical-align: bottom;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .ascii-art { 
+      white-space: pre;
+      color: #7fffd4;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    .footer { 
+      color: #aaaaaa;
+      font-size: 30px;
+      border-top: 1px dashed #555;
+      padding-top: 10px;
+      width: 100%;
+    }
+      .ascii-art {
+    font-family: monospace;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 20px;
+    border-radius: 8px;
+    white-space: pre-wrap;  /* preserve spaces and new lines */
+    max-width: 600px;
+  }
+  #keyword {
+    color: #569cd6;
+    font-weight: bold;
+  }
+  #funcname {
+    color: #dcdcaa;
+  }
+  #par {
+    color: #d4d4d4;
+  }
+  #cot {
+    color: #ce9178;
+  }
+  #text {
+    color: #9cdcfe;
+  }
+  #specialtext {
+    color: #c586c0;
+    font-style: italic;
+  }
+
+
+ 
+  @media (max-width: 600px) {
+    .sql-line {
+      font-size: 500px; 
+    }
+    
+  }
+  </style>
+</head>
+<body>
+    <div class="footer">
+    Made with ❤️ by <strong>Koussay Chemingui ISI</strong>
+  </div>
+  <div class="sql-line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="table-name">statistics</span></div>
+  <div class="sql-line"><span class="keyword">WHERE</span> <a href="{% url 'isi_stats' %}" class="link">department = 'ISI'</a></div>
+  <div class="sql-line"><span class="keyword">OR</span> <a href="{% url 'si_stats' %}" class="link">department = 'SI'</a><span class="cursor"></span></div>
+ 
+  <pre class="ascii-art">{developer@cli:~ }$ echo "Coding Mode Activated" 💻
+<span id="keyword">def</span> <span id="funcname">run_program</span>():
+   <span id="keyword">print</span><span id="par">(</span><span id="cot">"</span><span id="text">Statistics</span><span id="cot">"</span><span id="par">)</span>
+   🐛 <span id="specialtext">← Found it!</span>
+💡 Powered by coffee & terminal magic
+    </pre>
+  
+</body>
+</html>

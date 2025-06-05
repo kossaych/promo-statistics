@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Student Grade Card</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
+
+  /* Subtle paper texture using repeated linear gradients to create grain */
+  body {
+    padding: 300px;
+    font-family: 'Courier Prime', monospace;
+    background: 
+      repeating-linear-gradient(
+        45deg,
+        #fff,
+        #fff 2px,
+        #f9f9f9 3px,
+        #fff 4px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        #fff,
+        #fff 2px,
+        #f9f9f9 3px,
+        #fff 4px
+      );
+    background-size: 20px 20px;
+    color: #111;
+    margin: 00px auto;
+    max-width: 700px;
+    line-height: 1.5;
+    font-size: 14pt;
+    -webkit-print-color-adjust: exact;
+    position: relative;
+    padding: 20px;
+  }
+
+  /* Simulate slight noise overlay using a pseudo element */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1.5px),
+      radial-gradient(rgba(0,0,0,0.015) 1px, transparent 1.5px);
+    background-position: 0 0, 10px 10px;
+    background-repeat: repeat;
+    background-size: 20px 20px;
+    z-index: 1000;
+  }
+
+  h1, h2 {
+    font-weight: normal;
+    margin-bottom: 0.3em;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 0.5px rgba(0,0,0,0.1),
+      0.5px 0.5px 0 rgba(0,0,0,0.05);
+  }
+
+  .header-info {
+    margin-bottom: 2em;
+    border-bottom: 1.5px solid #111;
+    padding-bottom: 0.5em;
+    letter-spacing: 0.5px;
+  }
+
+  .header-info div {
+    margin-bottom: 0.3em;
+    text-shadow: 0 0 0.6px rgba(0,0,0,0.07);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 3em;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px #111,
+      1px 1px 0 1px rgba(0,0,0,0.1); /* subtle ink shadow for borders */
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  thead tr {
+    background: #eee;
+    box-shadow: inset 0 -1px 1px rgba(0,0,0,0.1);
+  }
+
+  th, td {
+    border: 1px solid #111;
+    padding: 8px 10px;
+    text-align: center;
+    position: relative;
+    /* simulate uneven ink spots with tiny shadows */
+    text-shadow:
+      0 0 0.4px rgba(0,0,0,0.07),
+      0.3px 0.3px 0 rgba(0,0,0,0.05);
+    
+  }
+
+  tfoot td {
+    font-weight: bold;
+    border-top: 2px solid #111;
+    background: #f9f9f9;
+    text-shadow: none;
+  }
+
+  .term-title {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    font-size: 16pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow:
+      0 0 1px rgba(0,0,0,0.1);
+  }
+
+  /* Slightly irregular border lines by layering */
+  table, th, td {
+    border-style: solid; 
+  }
+  table {
+    border-width: 1.2px;
+  }
+  th, td {
+    border-width: 1.1px;
+  }
+
+
+@media (max-width: 600px) { 
+    table, th, td {
+        border-style: solid; 
+        font-size: 11pt;
+        padding: 4px 5px;
+    }   
+}
+</style>
+</head>
+<body>
+
+  <h1>Bultin</h1>
+
+  <div class="header-info">
+    <div><strong>Name:</strong> {{ nom }} {{prenom}} </div>
+    <div><strong>Student CIN:</strong> {{ id }}</div>
+    <div><strong>Major:</strong> {{ major}}</div>
+    <div><strong>Year:</strong>2025 </div>
+    <div><strong>Institution:</strong> ISSAT Sousse </div>
+    
+  </div>
+
+  <div class="term-section">
+    <div class="term-title">First Term</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Grade</th>
+          <th>Coef</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subject in first_term.subjects %}
+        <tr>
+          <td>{{ subject.name }}</td>
+          <td>{{ subject.grade }}</td>
+          <td>{{ subject.coef }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Average</td>
+          <td colspan="3">{{ first_term.average }}</td> 
+        </tr>
+        <tr>
+          <td>Rank for the first term</td>
+          <td colspan="3">{{ first_term.rank }}</td> 
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="term-section">
+    <div class="term-title">Second Term</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Grade</th>
+          <th>coef</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subject in second_term.subjects %}
+        <tr>
+          <td>{{ subject.name }}</td>
+          <td>{{ subject.grade }}</td>
+          <td>{{ subject.coef }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Average</td>
+          <td colspan="3">{{ second_term.average }}</td> 
+        </tr>
+        <tr>
+          <td>Rank second term</td>
+          <td colspan="3">{{ second_term.rank }}</td>  
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+
+
+  <div class="term-section">
+    <div class="term-title">Over all</div>
+    <table>
+      <thead>
+        <tr>
+          <th>term </th>
+          <th>Moyenne</th>
+          <th>Rank</th>
+          <th>Note</th> 
+        </tr>
+      </thead>
+      <tbody> 
+        <tr>
+          <td>First term</td>
+          <td>{{ moy_gen1 }}</td>
+          <td>{{ rang1 }}</td>
+          <td>
+            {% if rang1 <= 10 %}
+                <p>⭐Top 10</p>
+            {% elif rang1 <= 20 %}
+                <p> ⭐Top 20 </p> 
+            {% endif %}
+          </td>
+        </tr> 
+
+        <tr>
+          <td>Second term</td>
+          <td>{{ moy_gen1 }}</td>
+          <td>{{ rang1 }}</td>
+          <td>
+            {% if rang2 <= 10 %}
+                <p>⭐Top 10</p>
+            {% elif rang2 <= 20 %}
+                <p> ⭐Top 20 </p> 
+            {% endif %}
+          </td>
+        </tr> 
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <td>Average</td>
+          <td colspan="3">{{ moy_gen }}</td> 
+        </tr>
+        <tr>
+          <td>Rank over all</td>
+          <td colspan="3">{{ rang }}</td> 
+        </tr>
+
+
+        <tr>
+          <td>Score A</td>
+          <td colspan="3">{{ A }}</td> 
+        </tr>
+
+
+        
+
+
+        <tr>
+          <td>Score ML</td>
+          <td colspan="3">{{ ML }}</td> 
+        </tr>
+
+        <tr>
+          <td>Score E ISSAT sousse</td>
+          <td colspan="3">{{ E }}</td> 
+        </tr>
+
+        <tr>
+          <td>Score S ing</td>
+          <td colspan="3">{{ S }}</td> 
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div style="margin-top: 4em; display: flex; justify-content: space-between; align-items: center;">
+
+  <!-- Signature image -->
+  <div style="width: 40%; text-align: center;"> 
+    404 Not Found
+    <div style="font-size: 12px; font-family: monospace; color: #333; margin-top: 5px;">Signature of the Administration</div>
+  </div> 
+  <!-- Colored stamp image -->
+  <div style="width: 120px; height: 120px; color: red;">
+    and can't fake it 💀
+  </div>
+
+</div>
+
+
+</body>
+</html>
