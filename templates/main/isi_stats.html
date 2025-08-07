@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,12 +16,12 @@
         }
 
         .terminal-container {
-            width: 98%;
+            width: 95%;
             max-width: 1200px;
-            margin: 2% auto;
+            margin: 1rem auto;
             background-color: #000000;
             border: 1px solid #00ff00;
-            padding: 2rem;
+            padding: 1rem;
             overflow-x: auto;
         }
 
@@ -38,7 +37,7 @@
         }
 
         .cli-table th, .cli-table td {
-            padding: 0.5rem 1rem;
+            padding: 0.2rem 0.5rem;
             text-align: left; 
             border-bottom: 1px solid #00ff00;
         }
@@ -54,6 +53,51 @@
             background-color: transparent;
         }
         
+
+        /* Add these new mobile-friendly styles */
+        @media (max-width: 768px) {
+            .terminal-container {
+                width: 98%;
+                padding: 0.5rem;
+                margin: 0.5rem auto;
+            }
+
+            .text-3xl {
+                font-size: 1.5rem;
+            }
+
+            .text-xl {
+                font-size: 1.125rem;
+            }
+
+            .cli-table {
+                font-size: 0.875rem;
+            }
+
+            .cli-table th, .cli-table td {
+                padding: 0.1rem 0.2rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .responsive-table-wrapper {
+                position: relative;
+                margin-bottom: 1rem;
+            }
+
+            .responsive-table-wrapper::after {
+                content: '← Scroll →';
+                position: absolute;
+                bottom: -20px;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                color: #aaffaa;
+                font-size: 0.875rem;
+            }
+        }
 
     </style>
 </head>
@@ -89,27 +133,28 @@
 
         
 <!-- Search Section -->
-        <div class="mb-4">
-            <p class="text-xl text-[#aaffaa] mb-4">
-              <span class="prompt"></span>
-              <span>find --student</span>
-            </p>
-            <form id="studentRedirectForm" action="" method="GET" onsubmit="return redirectToStudentPage(event)" class="flex items-center">
-              <input 
-                type="text" 
-                id="studentIdInput" 
-                placeholder="Enter student CIN" 
-                required
-                class="p-2 bg-black text-[#aaffaa] border border-[#00ff00] focus:outline-none w-[250px]"
-              />
-              <button 
-                type="submit" 
-                class="ml-2 px-4 py-2 text-sm bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors"
-              >
-                Search
-              </button>
-            </form>
-        </div> 
+<div class="mb-4">
+    <p class="text-xl text-[#aaffaa] mb-4">
+        <span class="prompt"></span>
+        <span>find --student</span>
+    </p>
+    <form id="studentRedirectForm" action="" method="GET" onsubmit="return redirectToStudentPage(event)" 
+          class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <input 
+            type="text" 
+            id="studentIdInput" 
+            placeholder="Enter student CIN" 
+            required
+            class="p-2 bg-black text-[#aaffaa] border border-[#00ff00] focus:outline-none w-full sm:w-[250px]"
+        />
+        <button 
+            type="submit" 
+            class="px-4 py-2 text-sm bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors"
+        >
+            Search
+        </button>
+    </form>
+</div> 
         
         <!-- Students Table -->
         <div class="mb-8">
@@ -128,8 +173,8 @@
                 </button>
                 <span id="selectedCount" class="text-[#aaffaa] ml-2">(0 students selected)</span>
 
-                <div class="overflow-x-auto ">
-                    <table class="cli-table">
+                <div class="responsive-table-wrapper overflow-x-auto">
+                    <table class="cli-table min-w-[800px]">
                         <thead>
                             <tr>
                                 <th>Select for comparission</th>
@@ -178,7 +223,7 @@
                                     <button 
                                       type="button"
                                       onclick="window.location.href='/students/{{student.id}}'" 
-                                      class="px-2 py-2 bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"       
+                                      class="px-2  bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"       
                                     >
                                       View Details
                                     </button>
@@ -197,8 +242,8 @@
         <div id="subjects" style="display: none;">{{ subjects|json_script }}</div>
 
         <!-- Charts -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="border-2 border-[#00ff00] p-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+            <div class="border-2 border-[#00ff00] p-2 md:p-4">
                 <p class="text-xl text-[#aaffaa] mb-4">
                     <span class="prompt"></span>
                     <span>chart --grade-distribution</span>
@@ -207,7 +252,7 @@
                     <canvas id="gradeHistogram"></canvas>
                 </div>
             </div>
-            <div class="border-2 border-[#00ff00] p-4">
+            <div class="border-2 border-[#00ff00] p-2 md:p-4">
                 <p class="text-xl text-[#aaffaa] mb-4">
                     <span class="prompt"></span>
                     <span>chart --subject-averages</span>
@@ -241,19 +286,37 @@
         const chartConfig = {
             plugins: {
                 legend: {
-                    labels: { color: '#aaffaa' }
+                    labels: { 
+                        color: '#aaffaa',
+                        boxWidth: 20,
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     grid: { color: 'rgba(0, 255, 0, 0.1)' },
-                    ticks: { color: '#aaffaa' }
+                    ticks: { 
+                        color: '#aaffaa',
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
+                    }
                 },
                 x: {
                     grid: { color: 'rgba(0, 255, 0, 0.1)' },
-                    ticks: { color: '#aaffaa' }
+                    ticks: { 
+                        color: '#aaffaa',
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
+                    }
                 }
-            }
+            },
+            maintainAspectRatio: false,
+            responsive: true
         };
 
         new Chart(document.getElementById('gradeHistogram'), {
