@@ -1,354 +1,348 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Responsive Student Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ISI Statistics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #000000;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    #head {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px 20px;
-      background-color: #2c3e50;
-      color: white;
-      border-radius: 10px;
-      margin-bottom: 20px;
-        font-size: 18px;
-        font-weight: bold;
-        justify-content: space-between;
-    }
-    #homeb {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    #maker {
-      font-size: 11px;
-      color: #ecf0f1;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f6f9;
-      padding: 20px;
-      color: #333;
-    }
+        .terminal-container {
+            width: 98%;
+            max-width: 1200px;
+            margin: 2% auto;
+            background-color: #000000;
+            border: 1px solid #00ff00;
+            padding: 2rem;
+            overflow-x: auto;
+        }
 
-    .dashboard {
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
+        .prompt::before {
+            content: 'dev@isi-dashboard:~$ ';
+            color: #00ff00;
+            margin-right: 0.5rem;
+        }
 
-    .sidebar { 
-      background-color: #2c3e50; 
-      color: white;
-      padding: 20px;
-      border-radius: 10px;
-      flex: 1 1 250px; 
-    }
+        .cli-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
 
-    .sidebar h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    .sidebar div {
-      margin-bottom: 15px;
-      width: 100%;
-    }
-
-    .main {
-      flex: 3 1 600px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .stats-cards {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .card {
-      background-color: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      flex: 1 1 200px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    }
-
-    .card h3 {
-      font-size: 16px;
-      margin-bottom: 10px;
-      color: #7f8c8d;
-    }
-
-    .card p {
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    h2 {
-      color: #34495e;
-      margin-bottom: 10px;
-    }
-
-    .main  {
-        width: 100%;
-        overflow: auto;
-    }
-    table {  
-      width: 100%;
-      border-collapse: collapse;
-      background-color: white;
-      border-radius: 10px;
-      overflow-x: auto;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      height: 50px;
-    }
-
-    th, td {
-      padding:5px;
-      text-align: center;
-      border-bottom: 1px solid #ecf0f1;
-    }
-
-    th {
-      background-color: #2980b9;
-      color: white;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-      border-radius: 10px;
-    }
+        .cli-table th, .cli-table td {
+            padding: 0.5rem 1rem;
+            text-align: left; 
+            border-bottom: 1px solid #00ff00;
+        }
 
 
-    
-    .charts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .chart-container {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    }
-    @media screen and (max-width: 768px) {
-      .charts {
-        grid-template-columns: 1fr;
-      }
-      
+        .cli-table th { 
+            color: white; 
+        }
         
-    }
+        .chart-container {
+            height: 400px;
+            width: 100%;
+            background-color: transparent;
+        }
+        
 
-     
-  </style>
+    </style>
 </head>
 <body>
-  <div id="head"> 
-        <a id="homeb" href="{% url 'home' %}"  >🏠 Home</a>  
-        <span id="maker">made with ❤️ by koussay chemingui ISI</span>    
-  </div>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <h1>Statistics</h1>
-      <div>📚 nb Students: <strong>{{ students|length }}</strong></div>
-      <div>✅ nb students Passed: <strong>{{ studentspassed }}</strong></div>
-      <div>❌ nb students controle: <strong>{{ studentscontrole }}</strong></div>
-      <div>📖 nb Subjects: <strong>{{ subjects|length }}</strong></div>
-      <div>📊 la moyenne de la promotion: <strong>{{ moy_gen_all }}</strong></div>
+    <div class="terminal-container">
+        <!-- Header -->
+        <div class="text-3xl font-normal mb-8 text-center text-[#800080] border-2 border-dashed border-[#006400] py-2">
+            <p>ISI STATISTICS DASHBOARD</p>
+        </div>
 
+        <p class="text-xl">
+            <span class="prompt"></span>
+            <span class="text-[#aaffaa]">stats --view-all</span>
+        </p>
 
-      <div style="margin-top: 30px; background-color: #34495e; padding: 15px; border-radius: 10px; color: white;">
-        <h2 style="font-size: 18px; margin-bottom: 15px; color: #ecf0f1;">🔍Find Student Stats</h2>
-        <form id="studentRedirectForm" action="" method="GET" onsubmit="return redirectToStudentPage(event)">
-            <input 
-            type="text" 
-            id="studentIdInput" 
-            placeholder="Enter student CIN" 
-            required
-            style="
-                width: 100%; 
-                padding: 10px; 
-                border-radius: 8px; 
-                border: none; 
-                font-size: 16px;
-                margin-bottom: 12px;
-                outline: none;
-                box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-            "
-            />
-            <button 
-            type="submit" 
-            style="
-                width: 100%; 
-                padding: 10px; 
-                background-color: #2980b9; 
-                border: none; 
-                border-radius: 8px; 
-                color: white; 
-                font-weight: bold; 
-                font-size: 16px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            "
-            onmouseover="this.style.backgroundColor='#1c5980'"
-            onmouseout="this.style.backgroundColor='#2980b9'"
-            >
-            Go
-            </button>
-        </form>
-      </div>
-
-
-    </div>
-    <!-- Main content -->
-    <div class="main">
-      <div>
-        <h2>🏆 Top Students</h2>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>First Name</th>
-                <th>Sem 1</th>
-                <th>Sem 2</th>
-                <th>Average</th>
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-8 text-[#aaffaa]">
+            <div class="border border-[#00ff00] p-4">
+                <p>📚 Students: <strong>{{ students|length }}</strong></p>
+                <p>📖 Subjects: <strong>{{ subjects|length }}</strong></p>
                 
-                <th>Score A</th>
-                <th>Score E ISSAT</th>
-                <th>Score ML (langues ang fr)</th>
-
-                <th>Score S</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for student in students %}
-                {% if student.rang <= 5 %}
-                  <tr id="{{ student.id }}">
-                    <td>{{ student.rang }}</td>
-                    <td>{{ student.nom }}</td>
-                    <td>{{ student.prenom }}</td>
-                    <td>{{ student.moy_gen1 }}</td>
-                    <td>{{ student.moy_gen2 }}</td>
-                    <td>{{ student.moy_gen }}</td>
-                    <td>{{ student.A }}</td>
-                    <td>{{ student.E }}</td> 
-                    <td>{{ student.ML }}</td>
-                    <td>{{ student.S }}</td>
-                  </tr>
-                {% endif %}
-              {% endfor %}
-            </tbody>
-          </table>
+            </div>
+            <div class="border border-[#00ff00] p-4">
+                <p>✅ Passed: <strong>{{ studentspassed }}</strong></p>
+                <p>❌ Control: <strong>{{ studentscontrole }}</strong></p>
+                
+            </div>
+            <div class="border border-[#00ff00] p-4">
+                <p>📊 Class Average: <strong>{{ moy_gen_all }}</strong></p>
+            </div>
         </div>
-      </div>
 
-      <!-- JSON data for charts -->
-      <div id="students" style="display: none;">{{ students|json_script }}</div>
-      <div id="subjects" style="display: none;">{{ subjects|json_script }}</div>
 
-      <!-- Charts -->
-      <div class="charts">
-        <div class="chart-container">
-          <p>🎓 Grade Distribution</p>
-          <canvas id="gradeHistogram"></canvas>
+        
+<!-- Search Section -->
+        <div class="mb-4">
+            <p class="text-xl text-[#aaffaa] mb-4">
+              <span class="prompt"></span>
+              <span>find --student</span>
+            </p>
+            <form id="studentRedirectForm" action="" method="GET" onsubmit="return redirectToStudentPage(event)" class="flex items-center">
+              <input 
+                type="text" 
+                id="studentIdInput" 
+                placeholder="Enter student CIN" 
+                required
+                class="p-2 bg-black text-[#aaffaa] border border-[#00ff00] focus:outline-none w-[250px]"
+              />
+              <button 
+                type="submit" 
+                class="ml-2 px-4 py-2 text-sm bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors"
+              >
+                Search
+              </button>
+            </form>
+        </div> 
+        
+        <!-- Students Table -->
+        <div class="mb-8">
+            <p class="text-xl text-[#aaffaa] mb-4">
+                <span class="prompt"></span>
+                <span>list --top-students</span>
+            </p>
+            <form id="compareForm" action="/compare-students" method="GET">
+                <button 
+                    type="submit" 
+                    id="compareButton"
+                    disabled
+                    class="  px-4 py-2 bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Compare Selected Students
+                </button>
+                <span id="selectedCount" class="text-[#aaffaa] ml-2">(0 students selected)</span>
+
+                <div class="overflow-x-auto ">
+                    <table class="cli-table">
+                        <thead>
+                            <tr>
+                                <th>Select for comparission</th>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>First Name</th>
+                                <th>Sem 1</th>
+                                <th>Sem 2</th>
+                                <th>Average</th>
+                                <th>Score A</th>
+                                <th>Score E ISSAT</th>
+                                <th>Score ML</th>
+                                <th>Score S</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                              {% if student.rang <= 5 %}
+                                <tr style="color: {% cycle '#ff00ff' '#ffff00' '#ff0000' '#00e5e5' %}"  id="{{ student.id }}">
+                                  <td>
+                                    <label class="cursor-pointer select-none flex items-center">
+                                      <input 
+                                        type="checkbox" 
+                                        name="selected_students" 
+                                        value="{{ student.id }}" 
+                                        class="peer hidden"
+                                        onchange="updateSelectedCount()"
+                                      >
+                                      <span class="font-mono text-lg peer-checked:hidden">[ ]</span>
+                                      <span class="font-mono text-lg hidden peer-checked:inline">[X]</span>
+                                    </label>
+                                  </td>
+
+                                  <td >{{ student.rang }}</td>
+                                  <td  >{{ student.nom }}</td>
+                                  <td  >{{ student.prenom }}</td>
+                                  <td  >{{ student.moy_gen1 }}</td>
+                                  <td  >{{ student.moy_gen2 }}</td>
+                                  <td  >{{ student.moy_gen }}</td>
+                                  <td  >{{ student.A }}</td>
+                                  <td  >{{ student.E }}</td> 
+                                  <td  >{{ student.ML }}</td>
+                                  <td  >{{ student.S }}</td> 
+                                  <td>
+                                    <button 
+                                      type="button"
+                                      onclick="window.location.href='/students/{{student.id}}'" 
+                                      class="px-2 py-2 bg-black text-[#aaffaa] border border-[#00ff00] hover:bg-[#00ff00] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"       
+                                    >
+                                      View Details
+                                    </button>
+                                  </td>
+                                </tr>
+                              {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
         </div>
-        <div class="chart-container">
-          <p>📘 Subject Averages</p>
-          <canvas id="subjectAverages"></canvas>
+
+        <!-- JSON data for charts -->
+        <div id="students" style="display: none;">{{ students|json_script }}</div>
+        <div id="subjects" style="display: none;">{{ subjects|json_script }}</div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="border-2 border-[#00ff00] p-4">
+                <p class="text-xl text-[#aaffaa] mb-4">
+                    <span class="prompt"></span>
+                    <span>chart --grade-distribution</span>
+                </p>
+                <div class="chart-container">
+                    <canvas id="gradeHistogram"></canvas>
+                </div>
+            </div>
+            <div class="border-2 border-[#00ff00] p-4">
+                <p class="text-xl text-[#aaffaa] mb-4">
+                    <span class="prompt"></span>
+                    <span>chart --subject-averages</span>
+                </p>
+                <div class="chart-container">
+                    <canvas id="subjectAverages"></canvas>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <p class="mt-8 text-sm">
+            <span class="text-[#aaffaa]">⚡ Hack The Mainframe ~ made by Koussay Chemingui</span>
+        </p>
     </div>
-  </div>
 
-  <!-- JavaScript for Charts -->
-  <script>
-    const students = JSON.parse(document.getElementById('students').textContent);
-    const subjects = JSON.parse(document.getElementById('subjects').textContent);
+    <!-- JavaScript for Charts -->
+    <script>
+        const students = JSON.parse(document.getElementById('students').textContent);
+        const subjects = JSON.parse(document.getElementById('subjects').textContent);
 
-    const gradeBins = Array.from({ length: 21 }, (_, i) => i);
-    const gradeCounts = new Array(20).fill(0);
+        const gradeBins = Array.from({ length: 21 }, (_, i) => i);
+        const gradeCounts = new Array(20).fill(0);
 
-    students.forEach(student => {
-      const grade = student.moy_gen;
-      const binIndex = Math.floor(grade);
-      if (binIndex >= 0 && binIndex < 20) gradeCounts[binIndex]++;
-    });
+        students.forEach(student => {
+          const grade = student.moy_gen;
+          const binIndex = Math.floor(grade);
+          if (binIndex >= 0 && binIndex < 20) gradeCounts[binIndex]++;
+        });
 
-    new Chart(document.getElementById('gradeHistogram'), {
-      type: 'bar',
-      data: {
-        labels: gradeBins.slice(0, -1).map((v, i) => `${v}-${v + 1}`),
-        datasets: [{
-          label: 'Number of Students',
-          data: gradeCounts,
-          backgroundColor: 'rgba(54, 162, 235, 0.7)'
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: false,
-            text: 'Grade Distribution'
+        // Update chart configurations
+        const chartConfig = {
+            plugins: {
+                legend: {
+                    labels: { color: '#aaffaa' }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(0, 255, 0, 0.1)' },
+                    ticks: { color: '#aaffaa' }
+                },
+                x: {
+                    grid: { color: 'rgba(0, 255, 0, 0.1)' },
+                    ticks: { color: '#aaffaa' }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('gradeHistogram'), {
+          type: 'bar',
+          data: {
+            labels: gradeBins.slice(0, -1).map((v, i) => `${v}-${v + 1}`),
+            datasets: [{
+              label: 'Number of Students',
+              data: gradeCounts,
+              backgroundColor: "#000000",
+              borderColor: "#8A2BE2",
+              borderWidth: 1,
+              borderRadius: 0 
+            }]
+          },
+          options: {
+            ...chartConfig,
+            responsive: true
           }
-        }
-      }
-    });
+        });
 
-    const subjectAverages = subjects.map(subject =>
-      students.reduce((sum, student) => sum + (student[subject] || 0), 0) / students.length
-    );
+        const subjectAverages = subjects.map(subject =>
+          students.reduce((sum, student) => sum + (student[subject] || 0), 0) / students.length
+        );
 
-    new Chart(document.getElementById('subjectAverages'), {
-      type: 'bar',
-      data: {
-        labels: subjects,
-        datasets: [{
-          label: 'Average Score',
-          data: subjectAverages,
-          backgroundColor: 'rgba(255, 99, 132, 0.7)'
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: false,
-            text: 'Subject Averages'
+        new Chart(document.getElementById('subjectAverages'), {
+          type: 'bar',
+          data: {
+            labels: subjects,
+            datasets: [{
+              label: 'Average Score',
+              data: subjectAverages,  
+
+              backgroundColor: "#000000",
+              borderColor: "#8A2BE2",
+              borderWidth: 1,
+              borderRadius: 0 
+            }]
+          },
+          options: {
+            ...chartConfig,
+            responsive: true
           }
+        });
+
+
+        function redirectToStudentPage(event) {
+          event.preventDefault();
+          const id = document.getElementById('studentIdInput').value.trim();
+          if (!id) {
+            alert('Please enter a student ID.');
+            return false;
+          }
+            // Adjust the URL below to match your actual route pattern for student stats
+            window.location.href = `/students/${encodeURIComponent(id)}`;
+            return false; // prevent default form submission
         }
-      }
-    });
-    function redirectToStudentPage(event) {
-  event.preventDefault();
-  const id = document.getElementById('studentIdInput').value.trim();
-  if (!id) {
-    alert('Please enter a student ID.');
-    return false;
+        function updateSelectedCount() {
+  const selectedCheckboxes = document.querySelectorAll('input[name="selected_students"]:checked');
+  const compareButton = document.getElementById('compareButton');
+  const selectedCount = document.getElementById('selectedCount');
+  const count = selectedCheckboxes.length;
+
+  selectedCount.textContent = `(${count} students selected)`;
+  
+  // Enable compare button if at least 2 students are selected
+  if (count >= 2) {
+    compareButton.disabled = false;
+    compareButton.style.opacity = '1';
+  } else {
+    compareButton.disabled = true;
+    compareButton.style.opacity = '0.6';
   }
-    // Adjust the URL below to match your actual route pattern for student stats
-    window.location.href = `/students/${encodeURIComponent(id)}`;
-    return false; // prevent default form submission
-    }
-  </script>
+}
+
+document.getElementById('compareForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const selectedCheckboxes = document.querySelectorAll('input[name="selected_students"]:checked');
+  if (selectedCheckboxes.length < 2) {
+    alert('Please select at least 2 students to compare');
+    return;
+  }
+
+  const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+  const queryString = selectedIds.map(id => `student_ids=${id}`).join('&');
+  window.location.href = `/compare-students?${queryString}`;
+});
+    </script>
 </body>
 </html>
+

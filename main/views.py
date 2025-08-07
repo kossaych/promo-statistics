@@ -27,7 +27,7 @@ def si_stats(request):
         'students': context,
         'subjects': subjects,
     }
-    return render(request, 'main/si_stats.html', context)
+    return render(request, 'main/isi_stats.html', context)
 
 def isi_stats(request):
     try :
@@ -48,6 +48,21 @@ def isi_stats(request):
     }
     return render(request, 'main/isi_stats.html', context)
  
+def stats(request): 
+    si_students = si_services.get_students()
+    isi_students = isi_services.get_students()
+    students = si_students + isi_students
+
+    context = sorted(students, key=lambda d: d['moy_gen'],reverse = True)
+    subjects = isi_services.get_subjects()
+    subjects = list(subjects.keys())
+    context = { 
+        'students': context,
+        'subjects': subjects,
+    }
+    return render(request, 'main/isi_stats.html', context)
+ 
+
 def student_details(request,id) :
     try :
         PageView.objects.create(student_id=id, page='details', date_time=now())
@@ -110,12 +125,54 @@ def student_details(request,id) :
     }
     return render(request, 'main/spesific_student.html',context)
 
-
- 
-
 def all_views(request):
     views = PageView.objects.all().order_by('-date_time')  # Most recent first
     context = {
         'views': views
     }
     return render(request, 'main/page_views.html', context)
+
+ 
+def compare_students(request):
+    # Tracking view
+    try:
+        PageView.objects.create(student_id="compare", page='compare', date_time=now())
+    except:
+        PageView.objects.create(student_id='unknown', page='compare', date_time=now())
+
+    # Récupération des IDs depuis query string: /compare/?student_ids=1&student_ids=2
+    student_ids = request.GET.getlist('student_ids')
+    student_ids = [int(id) for id in student_ids if id.isdigit()]
+    print("Comparing students with IDs:", student_ids)
+
+    # Récupération de tous les étudiants
+    si_students = si_services.get_students()
+    isi_students = isi_services.get_students()
+    all_students = si_students + isi_students
+
+    # Filtrer ceux à comparer
+    students = [s for s in all_students if s['id'] in student_ids]
+
+    if not students:
+        return render(request, 'main/compare.html', {
+            'students': [],
+            'subjects': [],
+            'error': "Aucun étudiant trouvé à comparer."
+        })
+
+    # Déterminer toutes les matières uniques présentes
+    all_subjects = set()
+    for student in students:
+        for key in student.keys():
+            if key not in ['id','ML','E','rang_A','rang_S','rang_ML','rang_E','num', 'nom', 'prenom', 'moy_gen', 'moy_gen1', 'moy_gen2', 'rang', 'A', 'S', 'res', 'rang1', 'rang2']:
+                all_subjects.add(key)
+
+    all_subjects = list(all_subjects)
+    all_subjects.sort()
+
+    context = {
+        'students': students,
+        'subjects': all_subjects
+    }
+
+    return render(request, 'main/compare.html', context)

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comparaison Étudiants Ancien CLI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /*
+         * Define custom styles for the classic CLI terminal look and feel.
+         * Black background, glowing green text, and a vintage font.
+         */
+        body {
+            font-family: 'VT323', monospace; 
+            
+            background-color: #000000;
+        }
+
+        .terminal-container {
+            width: 98%;
+            max-width: 1024px;
+            margin: 2% auto;
+            background-color: #000000;
+            /* FIX: Title border is now dashed and dark green */
+            border: 1px solid #00ff00;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .prompt::before {
+            content: 'dev@isi-dashboard:~$ '; /* Classic Unix-style prompt from the image */
+            color: #00ff00;
+            margin-right: 0.5rem;
+        } 
+
+        .chart-container { 
+            height: 500px;  
+            width: 100%;
+        } 
+        .cli-table {
+            border-collapse: collapse; /* Remove space between cells */
+            width: 80%;  
+        }
+        .cli-table th, .cli-table td {
+            padding: 0 1rem;
+            text-align: left;
+        }
+
+        .cli-table thead th {
+            border-bottom: 2px  solid #00ff00; 
+            color: #ffffff;
+        }
+
+        .cli-table tbody td {
+            color: #ffffff;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="terminal-container">
+        <div class="text-3xl font-normal mb-8 text-center text-[#800080] border-2 border-dashed border-[#006400] py-2">
+            <p>
+                STUDENT COMPARISON
+            </p>
+        </div>
+
+        <p class="text-xl">
+            <span class="prompt"></span>
+            <span class="text-[#aaffaa]">compare --students --show-graphs</span>
+        </p>
+        <p class="text-xl mb-4">
+            <span class="text-[#aaffaa]">dev@isi-dashboard:~$ cd /home</span>
+        </p>
+        
+        <div class="overflow-x-auto text-base text-[#aaffaa] mb-8">
+            <table class="cli-table">
+                <thead>
+                    <tr>
+                        <th class="w-[10ch]">Nom</th>
+                        <th class="w-[10ch]">Prénom</th>
+                        <th class="w-[7ch]">Rang</th>
+                        <th class="w-[10ch] text-right">Semestre 1</th>
+                        <th class="w-[10ch] text-right">Semestre 2</th>
+                        <th class="w-[10ch] text-right">Moyenne</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.nom }}</td>
+                        <td>{{ student.prenom }}</td>
+                        <td>{{ student.rang }}</td>
+                        <td class="text-right">{{ student.moy_gen1 }}</td>
+                        <td class="text-right">{{ student.moy_gen2 }}</td>
+                        <td class="text-right">
+                            <span style="color: {% cycle '#ff00ff' '#ffff00' '#ff0000' '#00e5e5' %}">
+                                {{ student.moy_gen }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="studentData" style="display: none;">
+            {{ students|json_script:"student-json" }}
+        </div>
+        <div id="subjectsData" style="display: none;">
+            {{ subjects|json_script:"subjects-json" }}
+        </div>
+
+        <div class="flex flex-col gap-8">
+            <p class="text-xl font-normal text-[#aaffaa] mb-2">
+                    <span class="prompt"></span>
+                    <span class="text-[#aaffaa]">$ Chart: Moyennes Générales</span>
+            </p>
+            <div class="p-2 border-2 border-[#00ff00] chart-container overflow-y-auto">
+                <canvas id="avgChart" class="bg-transparent w-full h-full  "></canvas>
+            </div>
+
+            <p class="text-xl font-normal text-[#aaffaa] ">
+                    <span class="prompt"></span>
+                    <span class="text-[#aaffaa]">$ Chart: Comparaison par matière</span>
+            </p>
+            <div class="p-2 border-2 border-[#00ff00] chart-container overflow-y-auto">
+                
+                <canvas id="radarChart" class="bg-transparent w-full h-full"></canvas>
+            </div>
+        </div>
+
+        <p class="mt-8 text-sm">
+            <span class="text-[#aaffaa]">⚡ Hack The Mainframe ~ made by Koussay Chemingui</span>
+        </p>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Extract data from Django's JSON scripts
+            const students = JSON.parse(document.getElementById('student-json').textContent);
+            const subjects = JSON.parse(document.getElementById('subjects-json').textContent);
+            
+            // Define a color palette that fits the image design (yellow, green, purple)
+            const chartColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'];
+
+
+            // Initialize the Bar Chart for general averages
+            const avgChartCtx = document.getElementById('avgChart').getContext('2d');
+            const avgChart = new Chart(avgChartCtx, {
+                type: 'bar',
+                data: {
+                    // FIX: Using only the last name to match the image design
+                    labels: students.map(s => s.nom),
+                    datasets: [{
+                        label: 'Moyenne Générale',
+                        data: students.map(s => s.moy_gen),
+                        backgroundColor: "#000000",
+                        borderColor: "#8A2BE2",
+                        borderWidth: 1,
+                        borderRadius: 0 // Sharp corners for the retro feel
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20,
+                            grid: { color: 'rgba(150, 238, 144, 0.2)' },
+                            ticks: { color: '#aaffaa', font: { family: 'VT323' } }
+                        },
+                        x: {
+                            grid: { color: 'rgba(150, 238, 144, 0.2)' },
+                            ticks: { color: '#aaffaa', font: { family: 'VT323' } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#aaffaa', font: { family: 'VT323' } } },
+                        tooltip: {
+                            titleColor: '#aaffaa',
+                            bodyColor: '#ffff00',
+                            backgroundColor: '#000000',
+                            borderColor: '#aaffaa',
+                            borderWidth: 1,
+                            bodyFont: { family: 'VT323' },
+                            titleFont: { family: 'VT323' }
+                        }
+                    }
+                }
+            });
+
+            // Initialize the Radar Chart for subject scores
+            const radarChartCtx = document.getElementById('radarChart').getContext('2d');
+            const radarDatasets = students.map((student, index) => {
+                const color = chartColors[index % chartColors.length];
+                return {
+                    label: `${student.nom} ${student.prenom}`,
+                    data: subjects.map(subj => student[subj] || 0),
+                    backgroundColor: `${color}40`, // Add transparency
+                    borderColor: color,
+                    pointBackgroundColor: color,
+                    pointBorderColor: '#000000',
+                    pointHoverBackgroundColor: '#000000',
+                    pointHoverBorderColor: color,
+                    borderWidth: 2
+                };
+            });
+
+            const radarChart = new Chart(radarChartCtx, {
+                type: 'radar',
+                data: {
+                    labels: subjects,
+                    datasets: radarDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            suggestedMin: 0,
+                            suggestedMax: 20,
+                            pointLabels: {
+                                color: '#aaffaa',
+                                font: { family: 'VT323' }
+                            },
+                            grid: { color: 'rgba(150, 238, 144, 0.2)' },
+                            angleLines: { color: 'rgba(150, 238, 144, 0.4)' },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: '#aaffaa',
+                                font: { family: 'VT323' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#aaffaa', font: { family: 'VT323' } } },
+                        tooltip: {
+                            titleColor: '#aaffaa',
+                            bodyColor: '#ffff00',
+                            backgroundColor: '#000000',
+                            borderColor: '#aaffaa',
+                            borderWidth: 1,
+                            bodyFont: { family: 'VT323' },
+                            titleFont: { family: 'VT323' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

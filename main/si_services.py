@@ -101,16 +101,13 @@ def get_students():
             e["moy_gen1"] = moy_gen1
             e["moy_gen2"] = moy_gen2
             e["moy_gen"] = moy_gen
-            etudiants.append(e)
-            #print(moy_gen1,moy_gen2,moy_gen,sep="  ")
-
+            etudiants.append(e) 
     etudiants = sorted(etudiants, key=lambda d: d['moy_gen'],reverse = True)
     i = 1
     for etudiant in etudiants :
         etudiant['rang'] = i
         i += 1
- 
-    
+
     for etudiant in etudiants :
         if etudiant['moy_gen'] >= 15 : 
             M = 100
@@ -133,9 +130,6 @@ def get_students():
         etudiant['A'] = round(0.2 * M + 1.4 / 3 * R + 5 / 6 * ML + 2 / 3 * (B1 + B2),2)
         etudiant['E'] = round((etudiant['Analyse 1'] + etudiant['Algèbre 2'] + etudiant['Algèbre 1']  +etudiant['Analyse 2'] )/4 + (etudiant['Algo Struct donnée'] + etudiant['Algo&Struct Donnée 1'])/2 ,2)
         etudiant['S'] = round(0.7*etudiant['A'] + 0.3*etudiant['E'],2)
-
-
-
         
     etudiants = sorted(etudiants, key=lambda d: d['A'],reverse = True)
     i = 1
