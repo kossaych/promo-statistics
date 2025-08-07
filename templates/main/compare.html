@@ -25,9 +25,8 @@
             max-width: 1024px;
             margin: 2% auto;
             background-color: #000000;
-            /* FIX: Title border is now dashed and dark green */
             border: 1px solid #00ff00;
-            padding: 2rem;
+            padding: 1rem;
             overflow-x: auto;
         }
 
@@ -38,7 +37,7 @@
         } 
 
         .chart-container { 
-            height: 500px;  
+            height: 400px;  
             width: 100%;
         } 
         .cli-table {
@@ -59,6 +58,35 @@
             color: #ffffff;
         }
         
+        /* Add mobile-friendly styles */
+        @media (max-width: 768px) {
+            .terminal-container {
+                width: 95%;
+                padding: 0.5rem;
+                margin: 1rem auto;
+            }
+
+            .text-3xl {
+                font-size: 1.25rem;
+            }
+
+            .text-xl {
+                font-size: 1rem;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+
+            .cli-table {
+                width: 100%;
+                font-size: 0.875rem;
+            }
+
+            .cli-table th, .cli-table td {
+                padding: 0.25rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -78,35 +106,39 @@
             <span class="text-[#aaffaa]">dev@isi-dashboard:~$ cd /home</span>
         </p>
         
-        <div class="overflow-x-auto text-base text-[#aaffaa] mb-8">
-            <table class="cli-table">
-                <thead>
-                    <tr>
-                        <th class="w-[10ch]">Nom</th>
-                        <th class="w-[10ch]">Prénom</th>
-                        <th class="w-[7ch]">Rang</th>
-                        <th class="w-[10ch] text-right">Semestre 1</th>
-                        <th class="w-[10ch] text-right">Semestre 2</th>
-                        <th class="w-[10ch] text-right">Moyenne</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td>{{ student.nom }}</td>
-                        <td>{{ student.prenom }}</td>
-                        <td>{{ student.rang }}</td>
-                        <td class="text-right">{{ student.moy_gen1 }}</td>
-                        <td class="text-right">{{ student.moy_gen2 }}</td>
-                        <td class="text-right">
-                            <span style="color: {% cycle '#ff00ff' '#ffff00' '#ff0000' '#00e5e5' %}">
-                                {{ student.moy_gen }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="overflow-x-auto text-base text-[#aaffaa] mb-8 relative">
+            <!-- Add scroll indicator for mobile -->
+            <div class="md:hidden text-[#aaffaa] text-xs text-center mb-2">← Scroll horizontally →</div>
+            <div class="min-w-full overflow-x-auto">
+                <table class="cli-table">
+                    <thead>
+                        <tr>
+                            <th class="w-[10ch]">Nom</th>
+                            <th class="w-[10ch]">Prénom</th>
+                            <th class="w-[7ch]">Rang</th>
+                            <th class="w-[10ch] text-right">Semestre 1</th>
+                            <th class="w-[10ch] text-right">Semestre 2</th>
+                            <th class="w-[10ch] text-right">Moyenne</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.nom }}</td>
+                            <td>{{ student.prenom }}</td>
+                            <td>{{ student.rang }}</td>
+                            <td class="text-right">{{ student.moy_gen1 }}</td>
+                            <td class="text-right">{{ student.moy_gen2 }}</td>
+                            <td class="text-right">
+                                <span style="color: {% cycle '#ff00ff' '#ffff00' '#ff0000' '#00e5e5' %}">
+                                    {{ student.moy_gen }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="studentData" style="display: none;">
@@ -116,22 +148,25 @@
             {{ subjects|json_script:"subjects-json" }}
         </div>
 
-        <div class="flex flex-col gap-8">
-            <p class="text-xl font-normal text-[#aaffaa] mb-2">
+        <div class="flex flex-col gap-4 md:gap-8">
+            <div class="w-full">
+                <p class="text-xl font-normal text-[#aaffaa] mb-2">
                     <span class="prompt"></span>
                     <span class="text-[#aaffaa]">$ Chart: Moyennes Générales</span>
-            </p>
-            <div class="p-2 border-2 border-[#00ff00] chart-container overflow-y-auto">
-                <canvas id="avgChart" class="bg-transparent w-full h-full  "></canvas>
+                </p>
+                <div class="p-2 border-2 border-[#00ff00] chart-container">
+                    <canvas id="avgChart" class="bg-transparent"></canvas>
+                </div>
             </div>
 
-            <p class="text-xl font-normal text-[#aaffaa] ">
+            <div class="w-full">
+                <p class="text-xl font-normal text-[#aaffaa] mb-2">
                     <span class="prompt"></span>
                     <span class="text-[#aaffaa]">$ Chart: Comparaison par matière</span>
-            </p>
-            <div class="p-2 border-2 border-[#00ff00] chart-container overflow-y-auto">
-                
-                <canvas id="radarChart" class="bg-transparent w-full h-full"></canvas>
+                </p>
+                <div class="p-2 border-2 border-[#00ff00] chart-container">
+                    <canvas id="radarChart" class="bg-transparent"></canvas>
+                </div>
             </div>
         </div>
 
@@ -175,15 +210,36 @@
                             beginAtZero: true,
                             max: 20,
                             grid: { color: 'rgba(150, 238, 144, 0.2)' },
-                            ticks: { color: '#aaffaa', font: { family: 'VT323' } }
+                            ticks: {
+                                color: '#aaffaa',
+                                font: {
+                                    family: 'VT323',
+                                    size: window.innerWidth < 768 ? 10 : 12
+                                }
+                            }
                         },
                         x: {
                             grid: { color: 'rgba(150, 238, 144, 0.2)' },
-                            ticks: { color: '#aaffaa', font: { family: 'VT323' } }
+                            ticks: {
+                                color: '#aaffaa',
+                                font: {
+                                    family: 'VT323',
+                                    size: window.innerWidth < 768 ? 10 : 12
+                                }
+                            }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#aaffaa', font: { family: 'VT323' } } },
+                        legend: {
+                            labels: {
+                                color: '#aaffaa',
+                                font: {
+                                    family: 'VT323',
+                                    size: window.innerWidth < 768 ? 10 : 12
+                                }
+                            },
+                            position: window.innerWidth < 768 ? 'bottom' : 'top'
+                        },
                         tooltip: {
                             titleColor: '#aaffaa',
                             bodyColor: '#ffff00',
@@ -229,7 +285,10 @@
                             suggestedMax: 20,
                             pointLabels: {
                                 color: '#aaffaa',
-                                font: { family: 'VT323' }
+                                font: {
+                                    family: 'VT323',
+                                    size: window.innerWidth < 768 ? 10 : 12
+                                }
                             },
                             grid: { color: 'rgba(150, 238, 144, 0.2)' },
                             angleLines: { color: 'rgba(150, 238, 144, 0.4)' },
